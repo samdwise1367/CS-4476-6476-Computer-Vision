@@ -1,0 +1,11 @@
+build_voc step: 15
+build_voc bin: 8
+bag_sift step: 5
+bag_sift bin: 8
+vocab size:50
+bag_sift step: 5
+bag_sift bin: 8
+vocab size:50
+Using support vector machine classifier to predict test set categories
+Creating results_webpage/index.html, thumbnails, and confusion matrix
+Accuracy (mean of diagonal of confusion matrix) is 0.638

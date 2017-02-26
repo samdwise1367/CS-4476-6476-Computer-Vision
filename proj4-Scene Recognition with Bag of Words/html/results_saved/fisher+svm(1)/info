@@ -1,0 +1,10 @@
+Getting paths and labels for all train and test data
+Using fisher encoding representation for images
+bag_sift bin: 8
+bag_sift bin: 8
+vocab_size: 50
+vocab_step: 15
+encoding_Step: 5
+Using support vector machine classifier to predict test set categories
+Creating results_webpage/index.html, thumbnails, and confusion matrix
+Accuracy (mean of diagonal of confusion matrix) is 0.744

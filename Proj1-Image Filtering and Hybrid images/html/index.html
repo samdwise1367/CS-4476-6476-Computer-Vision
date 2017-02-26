@@ -1,0 +1,378 @@
+<html>
+<head>
+<title>Computer Vision Project</title>
+<link href='http://fonts.googleapis.com/css?family=Nunito:300|Crimson+Text|Droid+Sans+Mono' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" title="Default" href="styles/github.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+
+<link rel="stylesheet" href="highlighting/styles/default.css">
+<script src="highlighting/highlight.pack.js"></script>
+
+<style type="text/css">
+body {
+	margin: 0px;
+	width: 100%;
+	font-family: 'Crimson Text', serif;
+	font-size: 20px;
+	background: #fcfcfc;
+}
+h1 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 28px;
+	margin: 25px 0px 0px 0px;
+	text-transform: lowercase;
+
+}
+
+h2 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 32px;
+	margin: 15px 0px 35px 0px;
+	color: #333;
+	word-spacing: 3px;
+}
+
+h3 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 26px;
+	margin: 10px 0px 10px 0px;
+	color: #333;
+	word-spacing: 2px;
+}
+h4 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 22px;
+	margin: 10px 0px 10px 0px;
+	color: #333;
+	word-spacing: 2px;
+}
+
+h5 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 18px;
+	margin: 10px 0px 10px 0px;
+	color: #111;
+	word-spacing: 2px;
+}
+
+p, li {
+	color: #444;
+}
+
+a {
+	color: #DE3737;
+}
+
+.container {
+	margin: 0px auto 0px auto;
+	width: 960px;
+}
+
+#header {
+	background: #333;
+	width: 100%;
+}
+
+#headersub {
+	color: #ccc;
+	width: 960px;
+	margin: 0px auto 0px auto;
+	padding: 20px 0px 20px 0px;
+}
+
+.chart {
+	width: 480px;
+}
+.lol {
+	font-size: 16px;
+	color: #888;
+	font-style: italic;
+}
+.sep {
+	height: 1px;
+	width: 100%;
+	background: #999;
+	margin: 20px 0px 20px 0px;
+}
+.footer{
+	font-size: 16px;
+}
+.latex {
+	width: 100%;
+}
+
+.latex img {
+	display: block;
+	margin: 0px auto 0px auto;
+}
+
+pre {
+	font-family: 'Droid Sans Mono';
+	font-size: 14px;
+}
+
+td img {
+  vertical-align: middle;
+}
+
+#contents a {
+}
+</style>
+<script type="text/javascript">
+    hljs.initHighlightingOnLoad();
+</script>
+</head>
+<body>
+<div id="header" >
+<div id="headersub">
+<h1><span style="color: #DE3737"> Wenqi Xian </span></h1>
+</div>
+</div>
+<div class="container">
+
+<h2>Project 1: Image Filtering and Hybrid Images</h2>
+
+<h4>Image filtering</h4>
+<p>
+	Image filtering is a fundamental image processing tool. I implemented my_filter() which behaves like MATLAB built-in function imfilter(). 
+	The filter algorithm:
+</p>
+
+<ol>
+<li>Support arbitrary shaped filters containing odd dimensions</li>
+<li>Support grayscale and color images by extracting them into RGB channels</li>
+<li>Pad the input image with reflected image content by using MATLAB built-in function padarray()</li>
+<li>Return a filted image which has the same resolution as the input image</li>
+</ol>
+
+<h5>Example of code</h5>
+
+<pre><code>
+function output = my_imfilter(image, filter)
+% This function is intended to behave like the built in function imfilter().
+
+% The function works for filters of any width and height combination.
+filter_size = size(filter);
+image_size = size(image);
+
+% The filter can't be centered on pixels
+% at the image boundary without parts of the filter being out of bounds.
+% Handling this issue by mirroring the image content over the boundaries.
+top_border = floor(filter_size(1)/2);
+side_border = floor(filter_size(2)/2);
+resized = padarray(image, [top_border, side_border], 'symmetric');
+
+% Extract the output image and the resized(padded) input image 
+% into the individual red, green, and blue color channels.
+% Note the output image is initialized as the input image.
+filtered_red = image(:, :, 1);
+filtered_green = image(:, :, 2);
+filtered_blue = image(:, :, 3);
+
+resized_red = resized(:, :, 1);
+resized_green = resized(:, :, 2);
+resized_blue = resized(:, :, 3);
+
+% Iterate through the output image
+% and replace each pixel with the weighted sum of its neighbors.
+for m = 1 : image_size(1)
+    for n = 1 : image_size(2)
+        
+        sum_red = 0;
+        sum_green = 0;
+        sum_blue = 0;
+    
+	% Calculate the convolution of the filter
+	% and resized input image by piecewise multiplication.
+        for p = 1 : filter_size(1)
+            for q = 1 : filter_size(2)
+                sum_red = sum_red + filter(p,q) * resized_red(m + p - 1, n + q - 1);
+                sum_green = sum_green + filter(p,q) * resized_green(m + p - 1, n + q - 1);
+                sum_blue = sum_blue + filter(p,q) * resized_blue(m + p - 1, n + q - 1);
+            end
+        end
+
+	% Apply the result to each color channels of the output image
+        filtered_red(m, n) = sum_red;
+        filtered_green(m, n) = sum_green;
+        filtered_blue(m, n) = sum_blue;
+        
+    end
+end
+
+% Combine separate color channels into one RGB output image.
+output = cat(3, filtered_red, filtered_green, filtered_blue);
+
+end
+</code></pre>
+
+<div style="float: right; padding: 20px">
+<img src="hybrid_image_3.jpg" />
+<p style="font-size: 14px">Example of a hybrid image.</p>
+</div>
+
+<h4>Hybrid image</h4>
+<p> 
+	A hybrid image is a picture that combines the low-spatial frequency of one picture with the high spatial frequencies 
+	of another picture resulting in an image that looks different with the change of viewing distance. In the following picture, 
+	the person may appear to be Einstein, but if you steps back a few meters, it may look like Marilyn.
+</p>
+<p> 
+	The low frequency image is obtained by filtering one image with a low-pass filter, the high frequency image is obtained by 
+	filtering one image with high-pass filter. The final result is generated by adding these two filtered images.
+</p>
+
+<h5>Example of code</h5>
+<pre><code>
+
+%% Setup
+% read images and convert to floating point format
+image1 = im2single(imread('../data/motorcycle.bmp'));
+image2 = im2single(imread('../data/bicycle.bmp'));
+
+% The hybrid images will differ depending on which image you
+% assign as image1 (which will provide the low frequencies) and which image
+% you asign as image2 (which will provide the high frequencies)
+
+%% Filtering and Hybrid Image construction
+cutoff_frequency = 4; % This will be tuned for every image pair to get the best results.
+filter = fspecial('Gaussian', cutoff_frequency*4+1, cutoff_frequency);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Use my_imfilter to create 'low_frequencies' and
+% 'high_frequencies' and then combine them to create 'hybrid_image'
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Remove the high frequencies from image1 by blurring it. The amount of
+% blur that works best will vary with different image pairs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+low_frequencies = my_imfilter(image1, filter);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Remove the low frequencies from image2. The easiest way to do this is to
+% subtract a blurred version of image2 from the original version of image2.
+% This will give you an image centered at zero with negative values.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+high_frequencies = image2 - my_imfilter(image2, filter);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Combine the high frequencies and low frequencies
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+hybrid_image = low_frequencies + high_frequencies;
+
+%% Visualize and save outputs
+figure(1); imshow(low_frequencies)
+figure(2); imshow(high_frequencies + 0.5);
+vis = vis_hybrid_image(hybrid_image);
+figure(3); imshow(vis);
+imwrite(low_frequencies, 'low_frequencies.jpg', 'quality', 95);
+imwrite(high_frequencies + 0.5, 'high_frequencies.jpg', 'quality', 95);
+imwrite(hybrid_image, 'hybrid_image.jpg', 'quality', 95);
+imwrite(vis, 'hybrid_image_scales.jpg', 'quality', 95);
+</code></pre>
+
+
+<h3>Results in a table</h3>
+
+<p>
+	For the first two images of scales, the clear edges of high-frequency image are emphasized, then, 
+	for the last two images of scales, the influences of high-frequency image are reduced, and the appearance of low-frequency images become stronger.
+	For example, in the motorcyle and bicycle image shown below, color and contrast at high frequencies is used to enhance the bicycle up-close. From a distance, one sees a motorcycle. The
+	shape of the motorcycle is interpreted as shadows up-close.
+</p>	
+<p>
+	It is important to choose a good cutoff frequency for the filter.
+	I first defined the original cutoff frequency as the standard deviation, in pixels, of the Gaussian blur
+	and then manually tuned the cutoff frequency for every image pair to get the best results.
+	Generally, if it is hard to see the low-frequency image from far away, I will decrease the original cutoff frequency.
+	Lower cutoff frequency results in removing more high frequency from the hybrid image, so that the low-frequency images become
+	apparent from a shorter viewing distance. 
+	If it is hard to distinguish the high-frequency image from the shadow, I will increase the original cutoff frequency to strengthen the high-frequency image.
+</p>
+
+<table border="1">
+<tr>
+<td>
+<p> &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp high frequency &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+	+ &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp low frequency &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+	==> &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp hybrid image (scales) &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp</p>
+</td>
+</tr>
+
+<tr>
+<td>
+	<p> cutoff frequency: 5 </p>
+<img src="high_frequencies_1.jpg" width="24%"/>
+<img src="low_frequencies_1.jpg" width="24%"/>
+<img src="hybrid_image_scales_1.jpg" width="49%"/>
+</td>
+</tr>
+
+<tr>
+<td>
+	<p> cutoff frequency: 3 </p>
+<img src="high_frequencies_2.jpg" width="24%"/>
+<img src="low_frequencies_2.jpg" width="24%"/>
+<img src="hybrid_image_scales_2.jpg" width="49%"/>
+</td>
+</tr>
+
+<tr>
+<td>
+	<p> cutoff frequency: 3 </p>
+<img src="high_frequencies_3.jpg" width="24%"/>
+<img src="low_frequencies_3.jpg" width="24%"/>
+<img src="hybrid_image_scales_3.jpg" width="49%"/>
+</td>
+</tr>
+
+<tr>
+<td>
+	<p> cutoff frequency: 4 </p>
+<img src="high_frequencies_4.jpg" width="24%"/>
+<img src="low_frequencies_4.jpg" width="24%"/>
+<img src="hybrid_image_scales_4.jpg" width="49%"/>
+</td>
+</tr>
+
+<tr>
+<td>
+	<p> cutoff frequency: 4 </p>
+<img src="high_frequencies_5.jpg" width="24%"/>
+<img src="low_frequencies_5.jpg" width="24%"/>
+<img src="hybrid_image_scales_5.jpg" width="49%"/>
+</td>
+</tr>
+
+</table>
+
+<p>
+	I created an additional example of Trump vs Clinton. The images are perfectly aligned, and there is a clear transition 
+	from Clinton to Trump when changing the viewing distance. Have fun! :) 
+</p>	
+<table border=1>
+<tr>
+<td>
+	<p> cutoff frequency: 5 </p>
+<img src="high_frequencies_6.jpg" width="24%"/>
+<img src="low_frequencies_6.jpg" width="24%"/>
+<img src="hybrid_image_scales_6.jpg" width="49%"/>
+</td>
+</tr>
+</table>
+
+<h4> Reference </h4>
+<p>
+A. Oliva, A. Torralba, P.G. Schyns (2006). Hybrid Images. ACM Transactions on Graphics, ACM Siggraph, 25-3, 527-530.
+</p>
+</body>
+</html>
