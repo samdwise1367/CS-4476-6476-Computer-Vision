@@ -1,3 +1,2 @@
 Project 2: Local Feature Matching
-Student name: Wenqi Xian
-I submitted the project two days late. 
+http://www.cc.gatech.edu/~hays/compvision/results/proj2/html/wxian3/index.html

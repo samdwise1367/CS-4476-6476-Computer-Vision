@@ -1,5 +1,5 @@
 Project 4: Scene Recognition with Bag of Words 
-Student name: Wenqi Xian (wxian3)
+http://www.cc.gatech.edu/~hays/compvision/results/proj4/html/wxian3/index.html
 
 # Extra credit: 
 1.Experiment with many different vocabulary sizes and report performance.
@@ -16,8 +16,3 @@ please uncomment —> FEATURE = 'fisher encoding';
 %CLASSIFIER = 'nearest neighbor';
 please uncomment —> CLASSIFIER = 'support vector machine';
 %CLASSIFIER = 'placeholder';
-
-vocab.mat and stats.mat are pre-generated, so that the whole program will take around five minutes to run.
-
-Thank you and wish you a wonderful day!! :)
-(If there is any problem, please email me! wxian3@gatech.edu)
